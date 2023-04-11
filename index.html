@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linha</title>
+    <style>
+        * {
+            margin: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            border: 1px solid;
+            width: 500px;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="500" height="500"></canvas>
+    <script>
+        const canvas = document.querySelector('canvas');
+        const context = canvas.getContext('2d');
+        const reference = {x:250,y:250};
+
+        canvas.onmousemove = event => {
+            const canvasRect = canvas.getBoundingClientRect();
+            const x = event.clientX - canvasRect.x;
+            const y = event.clientY - canvasRect.y;
+            handleMouse({x, y});
+        }
+
+        function handleMouse(mouse) {
+            const m = calculateAngularCoefficient(mouse);
+            // f(x) = mx + n
+            // n = 250
+            context.fillStyle = 'black';
+            context.clearRect(0, 0, 500, 500);
+            const distance = Math.abs(mouse.x - reference.x);
+            const direction = mouse.x > reference.x ? 1 : -1;
+
+            const mouseDiffY = mouse.y - reference.y;
+            for (let i = 0; i < distance; i++) {
+                const y = f(i, m, direction);
+                if (i <= distance - 1) {
+                    context.fillRect(i * direction + reference.x, y, 1, ~~m === 0 ? 1 : m * direction);
+                } else {
+                    context.fillRect(i * direction + reference.x, y, 1, mouse.y - y)
+                }
+            }
+        }
+
+        function f(x, m, direction) {
+            return m*x * direction + reference.y;
+        }
+
+        function calculateAngularCoefficient(mouse) {
+            // M = (y2 - y1)/(x2 - x1) = tg a
+            const m = (mouse.y - reference.y)/(mouse.x - reference.x);
+            return m;
+        }
+    </script>
+</body>
+</html>
